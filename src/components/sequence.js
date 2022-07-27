@@ -41,7 +41,8 @@ var arc = d3.arc()
 
 // Use d3.text and d3.csvParseRows so that we do not need to have a header
 // row, and can receive the csv as an array of arrays.
-d3.text("./visit-sequences.csv", function(text) {
+d3.text("visit-sequences.csv", function(text) {
+  console.log(111);
   var csv = d3.csvParseRows(text);
   var json = buildHierarchy(csv);
   createVisualization(json);
@@ -87,6 +88,7 @@ function createVisualization(json) {
 
   // Get total size of the tree = value of root node from partition.
   totalSize = path.datum().value;
+  console.log(totalSize);
  };
 
 // Fade all but the current sequence, and show it in the breadcrumb trail.
@@ -222,10 +224,10 @@ function drawLegend() {
 
   var legend = d3.select("#legend").append("svg:svg")
       .attr("width", li.w)
-      .attr("height", Object.keys(colors).length * (li.h + li.s));
+      .attr("height", d3.keys(colors).length * (li.h + li.s));
 
   var g = legend.selectAll("g")
-      .data(Object.entries(colors))
+      .data(d3.entries(colors))
       .enter().append("svg:g")
       .attr("transform", function(d, i) {
               return "translate(0," + i * (li.h + li.s) + ")";

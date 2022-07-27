@@ -7,6 +7,7 @@ import { v4 } from 'uuid';
 import { Container, Row, Col, Button, InputGroup } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Labels from './Labels';
+import { main } from './sequence';
 
 const initialFormData = Object.freeze({
   location: '',
@@ -65,6 +66,10 @@ function App() {
   useEffect(() => {
     validation();
   }, [labelData, imageList])
+
+  // useEffect(() => {
+  //   main();
+  // })
 
   const passData = (formData) => {
     setLabelData(formData)
