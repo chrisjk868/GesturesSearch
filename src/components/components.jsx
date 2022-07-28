@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './components.css';
 import { labels_data } from "./labels_data.js";
 import { useState , useEffect } from 'react';
+import Hover from "./Hover.js";
 
 /* Label
  *
@@ -364,6 +365,7 @@ class Form extends React.Component {
         {category.subcategories.map(
           (subcategory) => this.render_subcategory(subcategory, color)
         )}
+       
       </div>
     );
   }
@@ -383,9 +385,10 @@ class Form extends React.Component {
       return (
         <div className="FormSubcategory">
           <div className="SubcategoryHeader">
-            <div className="SubcategoryName">
-              {subcategory.subcategory}
+            <div className="SubcategoryName">                         
             </div>
+            {subcategory.subcategory}  
+            <Hover text={subcategory.description}/>
           </div>
           <select
             className="Dropdown"
@@ -416,6 +419,7 @@ class Form extends React.Component {
             <div className="SubcategoryName">
               {subcategory.subcategory}
             </div>
+            <Hover text={subcategory.description}/>
           </div>
           <div className="LabelList" id={subcategory.subcategory}>
             {subcategory.labels.map((label) =>

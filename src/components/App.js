@@ -1,19 +1,27 @@
 //import './App.css';
-import { useState , useEffect } from 'react';
-import { Label, CheckLabel, Filter, FilterList, WaitingRoom, Form, Menu } from './components';
-import { storage } from '../firebase';
-import { getDatabase, onValue, ref as ref_db, set} from 'firebase/database';
-import { ref, uploadBytes, listAll, getDownloadURL } from 'firebase/storage';
-import { v4 } from 'uuid';
+import { useState, useEffect } from "react";
+import {
+  Label,
+  CheckLabel,
+  Filter,
+  FilterList,
+  WaitingRoom,
+  Form,
+  Menu,
+} from "./components";
+import { storage } from "../firebase";
+import { getDatabase, onValue, ref as ref_db, set } from "firebase/database";
+import { ref, uploadBytes, listAll, getDownloadURL } from "firebase/storage";
+import { v4 } from "uuid";
 //import { Container, Row, Col, Button, InputGroup } from 'react-bootstrap';
 //import 'bootstrap/dist/css/bootstrap.min.css'
 //import Labels from './Labels';
 
 const initialFormData = Object.freeze({
-  location: '',
-  all: '',
-  density: '',
-  attentive: '',
+  location: "",
+  all: "",
+  density: "",
+  attentive: "",
   head: false,
   eyes: false,
   mouth: false,
@@ -24,24 +32,24 @@ const initialFormData = Object.freeze({
   legs: false,
   feet: false,
   age: 0,
-  sex: '',
-  occupation: '',
-  posture: ''
+  sex: "",
+  occupation: "",
+  posture: "",
 });
 
 function App() {
   const [labelData, setLabelData] = useState();
   const [btnDisabled, setBtnState] = useState(true);
   const [imageUpload, setImageUpload] = useState(null);
-  const[imageList, setImageList] = useState([]);
+  const [imageList, setImageList] = useState([]);
   // const imageListRef = ref(storage, 'images/');
 
   //console.log(imageList)
 
   const uploadImage = () => {
     if (imageUpload == null) return;
-    let key = v4()
-    const imageRef  = ref(storage, `images/${key}`)
+    let key = v4();
+    const imageRef = ref(storage, `images/${key}`);
     //console.log(key);
     uploadBytes(imageRef, imageUpload).then((snapshot) => {
       getDownloadURL(snapshot.ref).then((url) => {
@@ -63,36 +71,36 @@ function App() {
     //     })
     //   })
     // })
-    const db = getDatabase()
-    const dbRef = ref_db(db, 'images')
+    const db = getDatabase();
+    const dbRef = ref_db(db, "images");
     onValue(dbRef, (snapshot) => {
       const data = snapshot.val();
       // console.log(data)
-      let append = []
+      let append = [];
       for (const [imgKey, labels] of Object.entries(data)) {
-        append.push([imgKey, labels])
+        append.push([imgKey, labels]);
       }
       setImageList(append);
-    })
-  }, [])
+    });
+  }, []);
 
   /* Check validation of uploading regularly. */
   useEffect(() => {
     validation();
-  }, [labelData, imageList])
+  }, [labelData, imageList]);
 
   const passData = (formData) => {
-    setLabelData(formData)
-  }
+    setLabelData(formData);
+  };
 
   /* Valid = all required fields filled. */
   const validation = () => {
-    let validLabels = (labelData !== initialFormData);
-    let validImg = (imageUpload !== null);
+    let validLabels = labelData !== initialFormData;
+    let validImg = imageUpload !== null;
     if (validLabels && validImg) {
       setBtnState(false);
     }
-  }
+  };
 
   // Implement Firebase Realtime Database Storage:
   // First get the UUID of uploaded image
@@ -101,38 +109,57 @@ function App() {
     //console.log(url)
     let finalLabels = processData(data, url);
     //console.log(finalLabels)
-    const db = getDatabase()
-    const path = 'images/' + id;
+    const db = getDatabase();
+    const path = "images/" + id;
     //console.log(path);
     set(ref_db(db, path), finalLabels);
-    return finalLabels
+    return finalLabels;
     // imageRef.push(finalLabels);
-  }
+  };
 
   const processData = (data, url) => {
-    const spectators_group = ['all', 'density', 'attentive']
-    const modality_group = ['head', 'eyes', 'mouth', 'facial_expression', 'arms', 'l_hand', 'r_hand', 'legs', 'feet']
-    const demographic_group = ['age', 'sex', 'occupation']
+    const spectators_group = ["all", "density", "attentive"];
+    const modality_group = [
+      "head",
+      "eyes",
+      "mouth",
+      "facial_expression",
+      "arms",
+      "l_hand",
+      "r_hand",
+      "legs",
+      "feet",
+    ];
+    const demographic_group = ["age", "sex", "occupation"];
     let finalLabels = {
-      'url': url,
-      'location': '',
-      'spectators': {},
-      'modality': {},
-      'demographic': {}
-    }
+      url: url,
+      location: "",
+      spectators: {},
+      modality: {},
+      demographic: {},
+    };
     for (let label in data) {
       if (spectators_group.includes(label)) {
-        finalLabels['spectators'] = {...finalLabels['spectators'], [label] : data[label]}
+        finalLabels["spectators"] = {
+          ...finalLabels["spectators"],
+          [label]: data[label],
+        };
       } else if (modality_group.includes(label)) {
-        finalLabels['modality'] = {...finalLabels['modality'], [label] : data[label]}
+        finalLabels["modality"] = {
+          ...finalLabels["modality"],
+          [label]: data[label],
+        };
       } else if (demographic_group.includes(label)) {
-        finalLabels['demographic'] = {...finalLabels['demographic'], [label] : data[label]}
+        finalLabels["demographic"] = {
+          ...finalLabels["demographic"],
+          [label]: data[label],
+        };
       } else {
         finalLabels[label] = data[label];
       }
     }
-    return finalLabels
-  }
+    return finalLabels;
+  };
 
   /*return (
     <div className="App">
